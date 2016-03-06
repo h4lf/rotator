@@ -66,10 +66,7 @@ void ioinit(void)
 	Port4Out(R_EAST_DDR, R_EAST);
 	Port4Out(R_SOUTH_DDR, R_SOUTH);
 	Port4Out(R_WEST_DDR, R_WEST);
-	ClrBit(R_NORTH_PORT, R_NORTH);
-	ClrBit(R_EAST_PORT, R_EAST);
-	ClrBit(R_SOUTH_PORT, R_SOUTH);
-	ClrBit(R_WEST_PORT, R_WEST);
+	ant_switch(north);
 	
 	Port4Inp(KEY_NORTH_DDR, KEY_NORTH);
 	Port4Inp(KEY_EAST_DDR, KEY_EAST);
@@ -126,6 +123,37 @@ void tick_2ms(void)
 	
 }
 
+void ant_switch(enum Directions Direct)
+{
+	ClrBit(R_NORTH_PORT, R_NORTH);
+	ClrBit(R_EAST_PORT, R_EAST);
+	ClrBit(R_SOUTH_PORT, R_SOUTH);
+	ClrBit(R_WEST_PORT, R_WEST);
+	switch(Direct)
+	{
+		case north: SetBit(R_NORTH_PORT, R_NORTH);
+		break;
+		case east: SetBit(R_EAST_PORT, R_EAST);
+		break;
+		case south: SetBit(R_SOUTH_PORT, R_SOUTH);
+		break;
+		case west: SetBit(R_WEST_PORT, R_WEST);
+		break;
+		case disconnect:
+		break;
+	}
+}
+
+enum Directions def_direction(uint16_t angle)
+{
+	if (angle > ANGLE_FULL_CIRCLE) angle -= ANGLE_FULL_CIRCLE;
+	if (angle > ANGLE_WEST) return north;
+	if (angle > ANGLE_SOUTH) return west;
+	if (angle > ANGLE_EAST) return south;
+	if (angle > ANGLE_NORTH) return east;
+	return north;
+}
+
 ISR(TIMER2_COMPA_vect)
 {
 	IsrFlag.itmr2 = 1;
@@ -151,7 +179,6 @@ ISR(USART_UDRE_vect)
 
 int main(void)
 {
-	
 	ioinit();
 	
     while(1)
@@ -165,12 +192,9 @@ int main(void)
 			tick_2ms();
 		}
 		
-		if (bit_is_set(UCSR0A, UDRE0))
+		if (bit_is_set(UCSR0A, UDRE0) && (TxIdxIn != TxIdxOut))
 		{ // data register empty
-			if (TxIdxIn != TxIdxOut)
-			{ //
 				UCSR0B |= (1<<UDRIE0); // data register empty interrupt enable
-			}
 		}
         //TODO:: Please write your application code 
     }
