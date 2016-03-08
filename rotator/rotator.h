@@ -85,6 +85,6 @@ void uart_send_pstr(const char *);
 void tick_2ms(void);
 void ant_switch(enum Directions);
 enum Directions def_direction(uint16_t);
-uint32_t str_to_dig_ul(char *);
+uint32_t str_to_num_ul(char *);
 
 #endif /* ROTATOR_H_ */

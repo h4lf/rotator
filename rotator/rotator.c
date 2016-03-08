@@ -154,6 +154,20 @@ enum Directions def_direction(uint16_t angle)
 	return north;
 }
 
+uint32_t str_to_num_ul(char * str)
+{
+	uint8_t digit, i;
+	uint32_t num = 0;
+	
+	for (i = 0; i < 9; i++)
+	{
+		digit = (uint8_t)*str++ - '0';
+		if (digit > 9) return num;
+		num = num * 10 + digit;
+	}
+	return num;
+}
+
 ISR(TIMER2_COMPA_vect)
 {
 	IsrFlag.itmr2 = 1;
