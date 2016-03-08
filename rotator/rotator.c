@@ -42,6 +42,13 @@ volatile struct isrflagglob
 	unsigned itmr2		: 1; // 
 } IsrFlag;
 
+struct flagglob
+{
+	unsigned azimuth	: 1; //
+}Gflag;
+
+char AzimuthDegree [4];
+
 #define TX_RBUF_SIZE 256
 uint8_t TxIdxIn;
 volatile uint8_t TxIdxOut;
@@ -144,28 +151,73 @@ void ant_switch(enum Directions Direct)
 	}
 }
 
-enum Directions def_direction(uint16_t angle)
+enum Directions def_direction(uint16_t Angle)
 {
-	if (angle > ANGLE_FULL_CIRCLE) angle -= ANGLE_FULL_CIRCLE;
-	if (angle > ANGLE_WEST) return north;
-	if (angle > ANGLE_SOUTH) return west;
-	if (angle > ANGLE_EAST) return south;
-	if (angle > ANGLE_NORTH) return east;
+	if (Angle > ANGLE_FULL_CIRCLE) Angle -= ANGLE_FULL_CIRCLE;
+	if (Angle > ANGLE_WEST) return north;
+	if (Angle > ANGLE_SOUTH) return west;
+	if (Angle > ANGLE_EAST) return south;
+	if (Angle > ANGLE_NORTH) return east;
 	return north;
 }
 
-uint32_t str_to_num_ul(char * str)
+uint32_t str_to_num_ul(char * Str)
 {
-	uint8_t digit, i;
-	uint32_t num = 0;
+	uint8_t Digit, Count;
+	uint32_t Num = 0;
 	
-	for (i = 0; i < 9; i++)
+	for (Count = 0; Count < 9; Count++)
 	{
-		digit = (uint8_t)*str++ - '0';
-		if (digit > 9) return num;
-		num = num * 10 + digit;
+		Digit = (uint8_t)*Str++ - '0';
+		if (Digit > 9) return Num;
+		Num = Num * 10 + Digit;
 	}
-	return num;
+	return Num;
+}
+
+void azimuth_find(char RxByte)
+{
+	static uint8_t State = 0;
+	static uint8_t StrIdx;
+	
+	if (!Gflag.azimuth)
+	{
+		if (State)
+		{
+			if (StrIdx == 3)
+			{
+				if (RxByte == '\r')
+				{
+					AzimuthDegree[StrIdx] = '\0';
+					Gflag.azimuth = 1;
+				} 
+				else
+				{
+					State = 0;
+				}
+			} 
+			else
+			{
+				if ((RxByte - '0') < 10)
+				{
+					AzimuthDegree[StrIdx] = RxByte;
+					StrIdx++;
+				}
+				else
+				{
+					State = 0;
+				}
+			}
+		}
+		else
+		{
+			if ((RxByte == 'M') || (RxByte == 'm'))
+			{
+				State = 1;
+				StrIdx = 0;
+			}
+		}
+	}
 }
 
 ISR(TIMER2_COMPA_vect)
