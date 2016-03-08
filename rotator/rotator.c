@@ -249,6 +249,10 @@ int main(void)
 	
     while(1)
     {
+		if (RxIdxIn != RxIdxOut)
+		{
+			azimuth_find(RxUartBuffer[RxIdxOut++]);
+		}
 		
 		if (IsrFlag.itmr2)
 		{
