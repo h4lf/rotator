@@ -190,15 +190,12 @@ void azimuth_find(char RxByte)
 				{
 					AzimuthDegree[StrIdx] = '\0';
 					Gflag.azimuth = 1;
-				} 
-				else
-				{
-					State = 0;
 				}
+				State = 0;
 			} 
 			else
 			{
-				if ((RxByte - '0') < 10)
+				if (((uint8_t)RxByte - '0') < 10U)
 				{
 					AzimuthDegree[StrIdx] = RxByte;
 					StrIdx++;
@@ -252,6 +249,22 @@ int main(void)
 		if (RxIdxIn != RxIdxOut)
 		{
 			azimuth_find(RxUartBuffer[RxIdxOut++]);
+		}
+		
+		if (Gflag.azimuth)
+		{
+			uint16_t Azimuth;
+			
+			Azimuth = (uint16_t)str_to_num_ul(AzimuthDegree);
+			if (Azimuth <= ANGLE_MAX)
+			{
+				ant_switch(def_direction(Azimuth));
+			} 
+			else
+			{
+				ClrBit(LED_PORT, LED);
+			}
+			Gflag.azimuth = 0;
 		}
 		
 		if (IsrFlag.itmr2)
