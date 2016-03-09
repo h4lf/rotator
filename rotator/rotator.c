@@ -248,7 +248,10 @@ int main(void)
     {
 		if (RxIdxIn != RxIdxOut)
 		{
-			azimuth_find(RxUartBuffer[RxIdxOut++]);
+			char RxByte = RxUartBuffer[RxIdxOut++];
+			azimuth_find(RxByte);
+			uart_send(RxByte);
+			if (RxByte == '\r') uart_send('\n');
 		}
 		
 		if (Gflag.azimuth)
