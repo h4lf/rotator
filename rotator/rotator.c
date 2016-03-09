@@ -59,6 +59,20 @@ volatile uint8_t RxIdxIn;
 uint8_t RxIdxOut;
 char RxUartBuffer [RX_RBUF_SIZE];
 
+const char PROGMEM StrCRLF[] = "\r\n";
+const char PROGMEM StrOk[] = "ok\r\n";
+const char PROGMEM StrError[] = "\r\nerror: ";
+const char PROGMEM StrError_azimuth_nvalid_range[] = "azimuth over 450";
+const char PROGMEM StrError_bad_command[] = "bad command";
+const char PROGMEM StrError_bad_digits[] = "must be 3 digits long";
+
+PGM_P const PROGMEM ErrorTable[] =
+{
+	StrError_azimuth_nvalid_range,
+	StrError_bad_command,
+	StrError_bad_digits
+};
+
 void ioinit(void)
 {
 	//------InitCLK
@@ -124,6 +138,13 @@ void uart_send_pstr(const char *Str)
 		uart_send(Byte); // Points to one ASCII to be written one at a time.
 	}
 }
+
+void uart_send_error(enum Errors Error)
+{
+	uart_send_pstr(StrError);
+	uart_send_pstr((PGM_P)pgm_read_word(&(ErrorTable[Error])));
+	uart_send_pstr(StrCRLF);
+};
 
 void tick_2ms(void)
 {
@@ -191,6 +212,7 @@ void azimuth_find(char RxByte)
 					AzimuthDegree[StrIdx] = '\0';
 					Gflag.azimuth = 1;
 				}
+				else uart_send_error(err_bad_digits);
 				State = 0;
 			} 
 			else
@@ -203,6 +225,7 @@ void azimuth_find(char RxByte)
 				else
 				{
 					State = 0;
+					uart_send_error(err_bad_digits);
 				}
 			}
 		}
@@ -213,6 +236,7 @@ void azimuth_find(char RxByte)
 				State = 1;
 				StrIdx = 0;
 			}
+			else uart_send_error(err_bad_command);
 		}
 	}
 }
@@ -249,9 +273,9 @@ int main(void)
 		if (RxIdxIn != RxIdxOut)
 		{
 			char RxByte = RxUartBuffer[RxIdxOut++];
-			azimuth_find(RxByte);
 			uart_send(RxByte);
 			if (RxByte == '\r') uart_send('\n');
+			azimuth_find(RxByte);
 		}
 		
 		if (Gflag.azimuth)
@@ -262,10 +286,12 @@ int main(void)
 			if (Azimuth <= ANGLE_MAX)
 			{
 				ant_switch(def_direction(Azimuth));
+				uart_send_pstr(StrOk);
 			} 
 			else
 			{
 				ClrBit(LED_PORT, LED);
+				uart_send_error(err_azimuth_invalid_range);
 			}
 			Gflag.azimuth = 0;
 		}

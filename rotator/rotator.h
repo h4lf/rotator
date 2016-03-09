@@ -78,10 +78,13 @@ typedef struct
 
 enum Directions {disconnect, north, east, south, west};
 
+enum Errors {err_azimuth_invalid_range, err_bad_command, err_bad_digits};
+
 void ioinit(void);
 void uart_send(char);
 void uart_send_hex_byte(uint8_t);
 void uart_send_pstr(const char *);
+void uart_send_error(enum Errors);
 void tick_2ms(void);
 void ant_switch(enum Directions);
 enum Directions def_direction(uint16_t);
