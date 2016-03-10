@@ -76,7 +76,7 @@ typedef struct
 	uint8_t		rem;
 }divmod10_t;
 
-enum Directions {disconnect, north, east, south, west};
+enum Directions {north, east, south, west, disconnect};
 
 enum Errors {err_azimuth_invalid_range, err_bad_command, err_bad_digits};
 
