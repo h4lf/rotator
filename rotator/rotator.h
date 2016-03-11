@@ -11,6 +11,7 @@
 
 #define UART_UBRR 51 /* 9600 bps at 8MHz (0.2% error) */
 #define TOP_TIMER2 249 /* 2mS at 8000000/64 */
+#define KEY_HOLD_T 255U
 
 #define ANGLE_MAX 450U
 #define ANGLE_FULL_CIRCLE 360U
@@ -86,6 +87,7 @@ void uart_send_hex_byte(uint8_t);
 void uart_send_pstr(const char *);
 void uart_send_error(enum Errors);
 void tick_2ms(void);
+uint8_t get_key(void);
 void ant_switch(enum Directions);
 enum Directions def_direction(uint16_t);
 uint32_t str_to_num_ul(char *);

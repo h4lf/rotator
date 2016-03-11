@@ -61,16 +61,29 @@ char RxUartBuffer [RX_RBUF_SIZE];
 
 const char PROGMEM StrCRLF[] = "\r\n";
 const char PROGMEM StrOk[] = "ok\r\n";
+const char PROGMEM StrKey[] = "key ";
 const char PROGMEM StrError[] = "\r\nerror: ";
+
 const char PROGMEM StrError_azimuth_nvalid_range[] = "azimuth over 450";
 const char PROGMEM StrError_bad_command[] = "bad command";
 const char PROGMEM StrError_bad_digits[] = "must be 3 digits long";
-
 PGM_P const PROGMEM ErrorTable[] =
 {
 	StrError_azimuth_nvalid_range,
 	StrError_bad_command,
 	StrError_bad_digits
+};
+
+const char PROGMEM StrNorth[] = "North";
+const char PROGMEM StrEast[] = "East";
+const char PROGMEM StrSouth[] = "South";
+const char PROGMEM StrWest[] = "West";
+PGM_P const PROGMEM DirectTable[] =
+{
+	StrNorth,
+	StrEast,
+	StrSouth,
+	StrWest
 };
 
 void ioinit(void)
@@ -148,7 +161,68 @@ void uart_send_error(enum Errors Error)
 
 void tick_2ms(void)
 {
+	static uint8_t scaler;
 	
+	if (scaler & 1)
+	{
+		uint8_t KeyCod;
+		enum Directions Direct;
+		
+		KeyCod = get_key();
+		if (KeyCod & 0x0F)
+		{
+			if (KeyCod & (1 << north)) Direct = north;
+			if (KeyCod & (1 << east)) Direct = east;
+			if (KeyCod & (1 << south)) Direct = south;
+			if (KeyCod & (1 << west)) Direct = west;
+			ant_switch(Direct);
+			uart_send_pstr(StrKey);
+			uart_send_pstr((PGM_P)pgm_read_word(&(DirectTable[Direct])));
+			uart_send(' ');
+			uart_send_pstr(StrOk);
+		}
+	}
+	
+	scaler++;
+}
+
+uint8_t get_key(void)
+{
+	static uint8_t KeyCount[4];
+	uint8_t KeyCod = 0;
+	uint8_t Count;
+	
+	if (bit_is_clear(KEY_NORTH_PIN, KEY_NORTH)) KeyCod |= (1 << north);
+	if (bit_is_clear(KEY_EAST_PIN, KEY_EAST)) KeyCod |= (1 << east);
+	if (bit_is_clear(KEY_SOUTH_PIN, KEY_SOUTH)) KeyCod |= (1 << south);
+	if (bit_is_clear(KEY_WEST_PIN, KEY_WEST)) KeyCod |= (1 << west);
+	for (Count=0; Count<4; Count++)
+	{
+		if (KeyCod&(1<<Count))
+		{
+			if (KeyCount[Count])
+			{
+				KeyCod &= ~(1<<Count);
+				if (KeyCount[Count] > KEY_HOLD_T)
+				{
+					KeyCod |= (16<<Count);
+				}
+				else
+				{
+					KeyCount[Count]++;
+				}
+			}
+			else
+			{
+				KeyCount[Count]++;
+			}
+		}
+		else
+		{
+			KeyCount[Count] = 0;
+		}
+	}
+	return KeyCod;
 }
 
 void ant_switch(enum Directions Direct)
