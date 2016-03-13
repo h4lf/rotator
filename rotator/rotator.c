@@ -161,9 +161,9 @@ void uart_send_error(enum Errors Error)
 
 void tick_2ms(void)
 {
-	static uint8_t scaler;
+	static uint8_t Scaler;
 	
-	if (scaler & 1)
+	if (Scaler & 1)
 	{
 		uint8_t KeyCod;
 		enum Directions Direct;
@@ -183,7 +183,7 @@ void tick_2ms(void)
 		}
 	}
 	
-	scaler++;
+	Scaler++;
 }
 
 uint8_t get_key(void)
@@ -203,7 +203,7 @@ uint8_t get_key(void)
 			if (KeyCount[Count])
 			{
 				KeyCod &= ~(1<<Count);
-				if (KeyCount[Count] > KEY_HOLD_T)
+				if (KeyCount[Count] == KEY_HOLD_T)
 				{
 					KeyCod |= (16<<Count);
 				}
