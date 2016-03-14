@@ -1,3 +1,26 @@
 GS-232A
 Computer Control Interface
 for Antenna Rotators
+
+COM port settings:
+9600 baud, 8 data bits, 1 stop bit, no parity, no handshake
+
+Angles:
+0-45    north
+46-135  east
+136-225 south
+226-315 west
+316-405 north
+406-450 east
+
+Pinout:
+pin arduino - pin ATmega328 - name        - direction - configure
+2           - PD2           - relay north - out       - push-pull
+3           - PD3           - relay east  - out       - push-pull
+4           - PD4           - relay south - out       - push-pull
+5           - PD5           - relay west  - out       - push-pull
+6           - PD6           - key north   - in        - pull-up
+7           - PD7           - key east    - in        - pull-up
+8           - PB0           - key south   - in        - pull-up
+9           - PB1           - key west    - in        - pull-up
+13          - PB5           - led         - out       - push-pull
