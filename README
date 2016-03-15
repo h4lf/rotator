@@ -3,7 +3,7 @@ Computer Control Interface
 for Antenna Rotators
 
 COM port settings:
-9600 baud, 8 data bits, 1 stop bit, no parity, no handshake
+1200 baud, 8 data bits, 1 stop bit, no parity, no handshake
 
 Angles:
 0-45    north

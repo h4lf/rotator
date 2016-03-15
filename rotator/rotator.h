@@ -9,7 +9,7 @@
 #ifndef ROTATOR_H_
 #define ROTATOR_H_
 
-#define UART_UBRR 51 /* 9600 bps at 8MHz (0.2% error) */
+#define UART_UBRR 416 /* 1200 bps at 8MHz (0.2% error) */
 #define TOP_TIMER2 249 /* 2mS at 8000000/64 */
 #define KEY_HOLD_T 255U
 
