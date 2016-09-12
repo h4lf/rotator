@@ -36,6 +36,7 @@
 #include <avr/pgmspace.h>
 #include <avr/sfr_defs.h>
 #include "rotator.h"
+#include "pin_macros.h"
 
 volatile struct isrflagglob
 {
@@ -96,24 +97,24 @@ void ioinit(void)
 	ACSR = 0x80;
 	
 	//------InitGPIO
-	Port4Out(R_NORTH_DDR, R_NORTH);
-	Port4Out(R_EAST_DDR, R_EAST);
-	Port4Out(R_SOUTH_DDR, R_SOUTH);
-	Port4Out(R_WEST_DDR, R_WEST);
+	DRIVER(R_NORTH,OUT);
+	DRIVER(R_EAST,OUT);
+	DRIVER(R_SOUTH,OUT);
+	DRIVER(R_WEST,OUT);
 	ant_switch(north);
 	
-	Port4Inp(KEY_NORTH_DDR, KEY_NORTH);
-	Port4Inp(KEY_EAST_DDR, KEY_EAST);
-	Port4Inp(KEY_SOUTH_DDR, KEY_SOUTH);
-	Port4Inp(KEY_WEST_DDR, KEY_WEST);
-	SetBit(KEY_NORTH_PORT, KEY_NORTH);
-	SetBit(KEY_EAST_PORT, KEY_EAST);
-	SetBit(KEY_SOUTH_PORT, KEY_SOUTH);
-	SetBit(KEY_WEST_PORT, KEY_WEST);
+	DRIVER(KEY_NORTH,IN);
+	DRIVER(KEY_EAST,IN);
+	DRIVER(KEY_SOUTH,IN);
+	DRIVER(KEY_WEST,IN);
+	DRIVER(KEY_NORTH,PULLUP);
+	DRIVER(KEY_EAST,PULLUP);
+	DRIVER(KEY_SOUTH,PULLUP);
+	DRIVER(KEY_WEST,PULLUP);
 	
-	Port4Out(LED_DDR, LED);
-	SetBit(LED_PORT, LED);
-	
+	DRIVER(LED,OUT);
+	ON(LED);
+		
 	//------Init TIMER2
 	TCCR2A = Bit(WGM21); // Clear Timer on Compare Match (CTC) mode
 	OCR2A = TOP_TIMER2;
@@ -192,10 +193,10 @@ uint8_t get_key(void)
 	uint8_t KeyCod = 0;
 	uint8_t Count;
 	
-	if (bit_is_clear(KEY_NORTH_PIN, KEY_NORTH)) KeyCod |= (1 << north);
-	if (bit_is_clear(KEY_EAST_PIN, KEY_EAST)) KeyCod |= (1 << east);
-	if (bit_is_clear(KEY_SOUTH_PIN, KEY_SOUTH)) KeyCod |= (1 << south);
-	if (bit_is_clear(KEY_WEST_PIN, KEY_WEST)) KeyCod |= (1 << west);
+	if (ACTIVE(KEY_NORTH)) KeyCod |= (1 << north);
+	if (ACTIVE(KEY_EAST)) KeyCod |= (1 << east);
+	if (ACTIVE(KEY_SOUTH)) KeyCod |= (1 << south);
+	if (ACTIVE(KEY_WEST)) KeyCod |= (1 << west);
 	for (Count=0; Count<4; Count++)
 	{
 		if (KeyCod&(1<<Count))
@@ -227,19 +228,19 @@ uint8_t get_key(void)
 
 void ant_switch(enum Directions Direct)
 {
-	ClrBit(R_NORTH_PORT, R_NORTH);
-	ClrBit(R_EAST_PORT, R_EAST);
-	ClrBit(R_SOUTH_PORT, R_SOUTH);
-	ClrBit(R_WEST_PORT, R_WEST);
+	OFF(R_NORTH);
+	OFF(R_EAST);
+	OFF(R_SOUTH);
+	OFF(R_WEST);
 	switch(Direct)
 	{
-		case north: SetBit(R_NORTH_PORT, R_NORTH);
+		case north: ON(R_NORTH);
 		break;
-		case east: SetBit(R_EAST_PORT, R_EAST);
+		case east: ON(R_EAST);
 		break;
-		case south: SetBit(R_SOUTH_PORT, R_SOUTH);
+		case south: ON(R_SOUTH);
 		break;
-		case west: SetBit(R_WEST_PORT, R_WEST);
+		case west: ON(R_WEST);
 		break;
 		case disconnect:
 		break;
@@ -364,7 +365,7 @@ int main(void)
 			} 
 			else
 			{
-				ClrBit(LED_PORT, LED);
+				OFF(LED);
 				uart_send_error(err_azimuth_invalid_range);
 			}
 			Gflag.azimuth = 0;
