@@ -26,50 +26,16 @@
 #define Port4Inp(port,bit) port &= ~_BV(bit)
 #define Bit(bit) _BV(bit)
 
-#define LED PINB5
-#define LED_PIN PINB
-#define LED_PORT PORTB
-#define LED_DDR DDRB
+#define LED B,5,H
+#define R_NORTH D,2,H
+#define R_EAST D,3,H
+#define R_SOUTH D,4,H
+#define R_WEST D,5,H
+#define KEY_NORTH D,6,L
+#define KEY_EAST D,7,L
+#define KEY_SOUTH B,0,L
+#define KEY_WEST B,1,L
 
-#define R_NORTH PIND2
-#define R_NORTH_PIN PIND
-#define R_NORTH_PORT PORTD
-#define R_NORTH_DDR DDRD
-
-#define R_EAST PIND3
-#define R_EAST_PIN PIND
-#define R_EAST_PORT PORTD
-#define R_EAST_DDR DDRD
-
-#define R_SOUTH PIND4
-#define R_SOUTH_PIN PIND
-#define R_SOUTH_PORT PORTD
-#define R_SOUTH_DDR DDRD
-
-#define R_WEST PIND5
-#define R_WEST_PIN PIND
-#define R_WEST_PORT PORTD
-#define R_WEST_DDR DDRD
-
-#define KEY_NORTH PIND6
-#define KEY_NORTH_PIN PIND
-#define KEY_NORTH_PORT PORTD
-#define KEY_NORTH_DDR DDRD
-
-#define KEY_EAST PIND7
-#define KEY_EAST_PIN PIND
-#define KEY_EAST_PORT PORTD
-#define KEY_EAST_DDR DDRD
-
-#define KEY_SOUTH PINB0
-#define KEY_SOUTH_PIN PINB
-#define KEY_SOUTH_PORT PORTB
-#define KEY_SOUTH_DDR DDRB
-
-#define KEY_WEST PINB1
-#define KEY_WEST_PIN PINB
-#define KEY_WEST_PORT PORTB
-#define KEY_WEST_DDR DDRB
 
 typedef struct
 {
