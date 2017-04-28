@@ -153,7 +153,7 @@ void uart_send_pstr(const char *Str)
 	}
 }
 
-void uart_send_error(enum Errors Error)
+void uart_send_error(errors_t Error)
 {
 	uart_send_pstr(StrError);
 	uart_send_pstr((PGM_P)pgm_read_word(&(ErrorTable[Error])));
@@ -167,7 +167,7 @@ void tick_2ms(void)
 	if (Scaler & 1)
 	{
 		uint8_t KeyCod;
-		enum Directions Direct;
+		directions_t Direct;
 		
 		KeyCod = get_key();
 		if (KeyCod & 0x0F)
@@ -226,7 +226,7 @@ uint8_t get_key(void)
 	return KeyCod;
 }
 
-void ant_switch(enum Directions Direct)
+void ant_switch(directions_t Direct)
 {
 	OFF(R_NORTH);
 	OFF(R_EAST);
@@ -247,7 +247,7 @@ void ant_switch(enum Directions Direct)
 	}
 }
 
-enum Directions def_direction(uint16_t Angle)
+directions_t def_direction(uint16_t Angle)
 {
 	if (Angle > ANGLE_FULL_CIRCLE) Angle -= ANGLE_FULL_CIRCLE;
 	if (Angle > ANGLE_WEST) return north;

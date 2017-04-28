@@ -37,25 +37,28 @@
 #define KEY_WEST B,1,L
 
 
-typedef struct
+struct divmod10_t
 {
 	uint32_t	quot;
 	uint8_t		rem;
-}divmod10_t;
+};
+typedef struct divmod10_t divmod10_t;
 
-enum Directions {north, east, south, west, disconnect};
+enum directions_t {north, east, south, west, disconnect};
+typedef enum directions_t directions_t;
 
-enum Errors {err_azimuth_invalid_range, err_bad_command, err_bad_digits};
+enum errors_t {err_azimuth_invalid_range, err_bad_command, err_bad_digits};
+typedef enum errors_t errors_t;
 
 void ioinit(void);
 void uart_send(char);
 void uart_send_hex_byte(uint8_t);
 void uart_send_pstr(const char *);
-void uart_send_error(enum Errors);
+void uart_send_error(errors_t);
 void tick_2ms(void);
 uint8_t get_key(void);
-void ant_switch(enum Directions);
-enum Directions def_direction(uint16_t);
+void ant_switch(directions_t);
+directions_t def_direction(uint16_t);
 uint32_t str_to_num_ul(char *);
 void azimuth_find(char);
 
