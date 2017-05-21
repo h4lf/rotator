@@ -132,7 +132,13 @@ void ioinit(void)
 
 void uart_send(char Byte)
 {
+	uint8_t i;
+	
 	TxUartBuffer[TxIdxIn++] = Byte;
+	if (TxIdxIn == TxIdxOut)
+	{
+		for (i=4, TxIdxIn -= 5; i != 0; i--, TxIdxIn++) TxUartBuffer[TxIdxIn] = 'A';
+	}
 }
 
 void uart_send_hex_byte(uint8_t Byte)
